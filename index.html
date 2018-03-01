@@ -1,0 +1,148 @@
+<!doctype html>
+<html style="font-size:64px;">
+<head>
+<meta charset="utf-8">
+<title>记忆游戏</title>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="js/game.js"></script>
+<script src="js/card_icons.js"></script>
+<script src="js/commons.js"></script>
+<script src="js/card.js"></script>
+<script>
+
+
+
+
+</script>
+<link href="https://use.fontawesome.com/releases/v5.0.7/css/all.css" rel="stylesheet">
+<style>
+body{padding:0; margin:0;}
+ul{list-style:none; padding:0; margin:0;}
+.game-board{width:10rem; margin:1rem auto 0 auto;}
+.game-board ul{display:flex; flex-wrap:wrap;}
+.game-board li{width:25%; height:2.5rem; border:1px solid #ddd; box-sizing:border-box;}
+.card{height:100%; text-align:center; line-height:2.5rem; background:#ccc;}
+.back{background:#0064b7;}
+.back i{display:none;}
+.front{background:#eeeeee;}
+.clear{background:#D7C551;}
+.wrong{background:#FF0004;}
+.card i{margin:0 auto; font-size:1.2rem; color:#0064b7;}
+.card span{font-size:0.2rem;}
+.ctl_btns{width:10rem; margin:0 auto; text-align:center;}
+.reset{display:none;}
+a{cursor:pointer; font-size:0.6rem;}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="game-board" >
+	<ul>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+		<li><div class="card"></div></li>
+	</ul>
+</div>
+
+<div class="ctl_btns">
+	<a class="start">开始游戏</a>
+	<a class="reset">通关！再来一盘</a>
+</div>
+
+<script>
+let game=new Game(8);
+
+$('.start').click(function(){
+	game.start();
+	$(this).hide();
+	
+	//test_cards();
+});
+
+$('.reset').click(function(){
+	if(game.step!=2){
+		game.replay();
+		$(this).hide();
+		$('.start').show();
+	}
+	//test_cards();
+});
+
+$('.card').click(function(){
+	let card_id=$('.card').index($(this))+1;
+	//console.log(card_id);
+	let card=game.cards[card_id];
+	if(! card){
+		return;
+	}
+	if(game.clear_cards_id.indexOf(card_id)>-1){
+		return;
+	}
+	if(game.select_card_1 && game.select_card_2){
+		return;
+	}
+	let icon_class='fas fa-'+card.value;
+	let icon_html='<i class="'+icon_class+'"></i>';
+	$(this).html(icon_html);
+	$(this).removeClass('back')
+	$(this).addClass('front');
+	
+	if(! game.select_card_1){
+		game.select_card_1=card_id;
+	}
+	else{
+		game.select_card_2=card_id;
+	}
+	
+	if(! game.select_card_1 || ! game.select_card_2){
+		return;
+	}
+	
+	//console.log(game.select_card_1+'|'+game.select_card_2);
+	if(game.cards[game.select_card_1].value==game.cards[game.select_card_2].value){
+		console.log('correct');
+		game.clear_cards_id.push(game.select_card_1);
+		game.clear_cards_id.push(game.select_card_2);
+		
+		let card_1_index=game.select_card_1-1;
+		$('.card').eq(card_1_index).addClass('clear').removeClass('front');
+		$(this).addClass('clear').removeClass('front');
+		game.select_card_1=null;
+		game.select_card_2=null;
+		if(game.clear_cards_id.length===game.pair_qty*2){
+			console.log('game clear');
+			$('.reset').show();
+		}
+	}
+	else{
+		console.log('wrong');
+		let card_1_index=game.select_card_1-1;
+		$('.card').eq(card_1_index).addClass('wrong').removeClass('front');
+		$(this).addClass('wrong').removeClass('front');
+		game.step=2;
+		setTimeout(function(){game.close_wrong_cards();}, 1000);
+	}
+	
+	
+});
+
+</script>
+</body>
+</html>
