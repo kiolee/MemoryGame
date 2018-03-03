@@ -17,6 +17,7 @@ function shuffle_array(array) {
     }
 }
 
+
 function test_icon(){
 	let icons=card_values;
 	for(let i=0; i<icons.length; i++){
